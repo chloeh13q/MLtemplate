@@ -10,6 +10,7 @@ fi
 # Run manual clean-up
 docker ps -q --filter "name=$NAME" | grep -q . && docker stop $NAME
 
+# Helper function to parse yaml file as environment variables
 # Reference: https://gist.github.com/pkuczynski/8665367
 parse_yaml() {
     local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
@@ -26,6 +27,7 @@ parse_yaml() {
     }'
 }
 
+# Helper function to print timestamp in place of echo
 function timestamp() {
     printf "[$(date "+%Y-%m-%d %T")] $(date -ud "@$SECONDS" "+elapsed: %T") %s\n" "$*" >&2
     SECONDS=0
@@ -36,6 +38,7 @@ SECONDS=0
 eval $(parse_yaml parameters.yaml)
 timestamp "Parsed parameters from parameters.yaml"
 
+# Log output to file
 if [ "$1" = "--logging" ]; then
     mkdir -p ${LOGDIR}
     exec >${LOGDIR}/$EPOCHSECONDS.log 2>&1
@@ -86,3 +89,4 @@ else
         papermill 04_deploy.ipynb output/04_deploy_output_$EPOCHSECONDS.ipynb -f parameters.yaml && \
         umask ${mask} && echo File mode creation mask set to $(umask)"
 fi
+timestamp "Done"
