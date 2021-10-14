@@ -8,7 +8,7 @@ bash run.sh --interactive
 
 Automatically run all the notebooks from command line:
 ```bash
-bash run.sh
+bash run.sh <--logging>
 ```
 
 <br />
