@@ -1,4 +1,5 @@
-# container parameters
+# bash script parameters
+LOGDIR: log
 NAME: template
 FROM_IMAGE: nvcr.io/nvidia/rapidsai/rapidsai
 CUDA_VER: 11.2

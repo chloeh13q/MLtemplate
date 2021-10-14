@@ -26,19 +26,30 @@ parse_yaml() {
     }'
 }
 
+function timestamp() {
+    printf "[$(date "+%Y-%m-%d %T")] $(date -ud "@$SECONDS" "+elapsed: %T") %s\n" "$*" >&2
+    SECONDS=0
+}
+SECONDS=0
+
 # Read yaml file
 eval $(parse_yaml parameters.yaml)
-echo "Parsed parameters from parameters.yaml"
+timestamp "Parsed parameters from parameters.yaml"
+
+if [ "$1" = "--logging" ]; then
+    mkdir -p ${LOGDIR}
+    exec >${LOGDIR}/$EPOCHSECONDS.log 2>&1
+fi
 
 # Pull Docker image
-echo "Pulling Docker image..."
+timestamp "Pulling Docker image..."
 docker build --network=host -t $NAME . \
     --build-arg FROM_IMAGE=${FROM_IMAGE} \
     --build-arg CUDA_VER=${CUDA_VER} \
     --build-arg IMAGE_TYPE=${IMAGE_TYPE} \
     --build-arg LINUX_VER=${LINUX_VER} \
     --build-arg CONTAINER_DEST=${CONTAINER_DEST}
-echo "Done"
+timestamp "Done"
 
 # Start Docker container
 # --network='host' fixes known issue with accessing resources while on VPN
@@ -48,7 +59,7 @@ echo "Done"
 # -a binds to container's STDIN, STDOUT, & STDERR
 # `Docker runs as `root` user by default & creates files owned by `root` user that can't be cleaned up by `git clean -ffdx` in the next run
 # Change file mode creation mask temporarily as workaround; note that files created by Docker are now world-writable files
-echo "Start running Docker container..."
+timestamp "Start running Docker container..."
 if [ $interactive = true ]; then 
     docker run --rm -it \
         --name $NAME \
