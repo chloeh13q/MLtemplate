@@ -1,0 +1,10 @@
+# container parameters
+NAME: template
+FROM_IMAGE: nvcr.io/nvidia/rapidsai/rapidsai
+CUDA_VER: 11.2
+IMAGE_TYPE: runtime
+LINUX_VER: ubuntu20.04
+GPUS: all
+CONTAINER_DEST: /data
+
+# notebook parameters
