@@ -4,12 +4,6 @@ if [ "$1" = "--interactive" ]; then
     interactive=true
 fi
 
-# GitLab CI/CD doesn't yet support the feature to run after_script when jobs are canceled...
-# Ref: https://gitlab.com/gitlab-org/gitlab-runner/-/issues/4843
-# Ref: https://gitlab.com/gitlab-org/gitlab/-/issues/15603
-# Run manual clean-up
-docker ps -q --filter "name=$NAME" | grep -q . && docker stop $NAME
-
 # Helper function to parse yaml file as environment variables
 # Reference: https://gist.github.com/pkuczynski/8665367
 parse_yaml() {
@@ -43,6 +37,12 @@ if [ "$1" = "--logging" ]; then
     mkdir -p ${LOGDIR}
     exec >${LOGDIR}/$EPOCHSECONDS.log 2>&1
 fi
+
+# GitLab CI/CD doesn't yet support the feature to run after_script when jobs are canceled...
+# Ref: https://gitlab.com/gitlab-org/gitlab-runner/-/issues/4843
+# Ref: https://gitlab.com/gitlab-org/gitlab/-/issues/15603
+# Run manual clean-up
+docker ps -q --filter "name=$NAME" | grep -q . && docker stop $NAME
 
 # Pull Docker image
 timestamp "Pulling Docker image..."
